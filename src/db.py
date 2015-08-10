@@ -1,19 +1,22 @@
-import sqlite3
 from os.path import join
 from src.constants import DATA_ROOT
 
+from sqlalchemy import Column, ForeignKey, Integer, String
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship
+from sqlalchemy import create_engine
+
 SQLITE_DB_PATH = join(DATA_ROOT, "sqlite.db")
-conn = sqlite3.connect(SQLITE_DB_PATH)
+
+Base = declarative_base()
 
 
-def create():
-    """Create the tables and schema in the database"""
-    cur = conn.cursor()
-    cur.execute(
-        """CREATE TABLE subject_matter (
-            comlog_id INT,
-            subject_matter VARCHAR,
-            other_subject_matter VARCHAR,
-            PRIMARY KEY (comlog_id)
-        )"""
-    )
+class SubjectMatter(Base):
+    __tablename__ = "subject_matter"
+    comlog_id = Column(Integer, primary_key=True)
+    subject_matter = Column(String, nullable=False)
+    other_subject_matter = Column(String, nullable=True)
+
+
+engine = create_engine("sqlite:///{0}".format(SQLITE_DB_PATH))
+Base.metadata.create_all(engine)
