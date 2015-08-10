@@ -12,7 +12,7 @@ Base = declarative_base()
 
 class SubjectMatter(Base):
     __tablename__ = "subject_matter"
-    primary_key = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     comlog_id = Column(Integer, nullable=False)
     subject_matter = Column(String, nullable=False)
     other_subject_matter = Column(String, nullable=True)
@@ -33,7 +33,7 @@ class CommunicationRegistrant(Base):
 
 class CommunicationDPOH(Base):
     __tablename__ = "communication_dpoh"
-    primary_key = Column(Integer, autoincrement=True, primary_key=True)
+    id = Column(Integer, autoincrement=True, primary_key=True)
     comlog_id = Column(Integer, nullable=False)
     dpoh_last_name = Column(String, nullable=False)
     dpoh_first_name = Column(String, nullable=False)
@@ -45,7 +45,8 @@ class CommunicationDPOH(Base):
 
 class Client(Base):
     __tablename__ = "client"
-    client_num = Column(Integer, nullable=False, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    client_num = Column(Integer, nullable=False)
     client_name = Column(String, nullable=False)
 
 

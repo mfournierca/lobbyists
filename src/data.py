@@ -6,7 +6,9 @@ Usage:
 
 Options:
 
-    --help  Show this help screen
+    --help      Show this help screen
+    --download  Download data
+    --load      Load data into the db
 """
 from urllib import urlretrieve
 from zipfile import ZipFile
@@ -60,7 +62,7 @@ def load_client(session):
         header = r.next()
         b = 0
         for row in r:
-            row = [i.decode("utf-8") for i in row]
+            row = [unicode(i, errors="replace") for i in row[:2]]
             session.add(db.Client(
                 client_num=row[0],
                 client_name=row[1]
@@ -143,4 +145,7 @@ def load_subject_matter(session):
 
 if __name__ == "__main__":
     args = docopt(__doc__)
-    download()
+    if args["--download"]:
+        download()
+    if args["--load"]:
+        load_all()
