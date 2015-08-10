@@ -46,7 +46,7 @@ def download():
     logbook.info("complete")
 
 
-def load_data():
+def load_all():
     session = sessionmaker(bind=db.engine)()
     load_subject_matter(session)
     load_communication_registrant(session)
@@ -60,6 +60,7 @@ def load_client(session):
         header = r.next()
         b = 0
         for row in r:
+            row = [i.decode("utf-8") for i in row]
             session.add(db.Client(
                 client_num=row[0],
                 client_name=row[1]
@@ -78,6 +79,7 @@ def load_communication_registrant(session):
         header = r.next()
         b = 0
         for row in r:
+            row = [i.decode("utf-8") for i in row]
             session.add(db.CommunicationRegistrant(
                 comlog_id=row[0],
                 client_num=row[1],
@@ -97,12 +99,13 @@ def load_communication_registrant(session):
 
 def load_communication_dpoh(session):
     with open(
-        join(SOURCE_DATA_ROOT, "Communication_DPOHExport")
+        join(SOURCE_DATA_ROOT, "Communication_DPOHExport.csv")
     ) as w:
-        r = csv.reader()
-        header = csv.next()
+        r = csv.reader(w)
+        header = r.next()
         b = 0
         for row in r:
+            row = [i.decode("utf-8") for i in row]
             session.add(db.CommunicationDPOH(
                 comlog_id=row[0],
                 dpoh_last_name=row[1],
@@ -126,6 +129,7 @@ def load_subject_matter(session):
         header = r.next()
         b = 0
         for row in r:
+            row = [i.decode("utf-8") for i in row]
             session.add(db.SubjectMatter(
                 comlog_id=row[0],
                 subject_matter=row[1],

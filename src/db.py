@@ -33,7 +33,8 @@ class CommunicationRegistrant(Base):
 
 class CommunicationDPOH(Base):
     __tablename__ = "communication_dpoh"
-    comlog_id = Column(Integer, nullable=False, primary_key=True)
+    primary_key = Column(Integer, autoincrement=True, primary_key=True)
+    comlog_id = Column(Integer, nullable=False)
     dpoh_last_name = Column(String, nullable=False)
     dpoh_first_name = Column(String, nullable=False)
     dpoh_title = Column(String, nullable=False)
