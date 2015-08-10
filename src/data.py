@@ -12,6 +12,9 @@ from urllib import urlretrieve
 from zipfile import ZipFile
 from os.path import join
 from docopt import docopt
+from sqlalchemy.orm import sessionmaker
+from datetime import datetime
+
 import logbook
 import csv
 
@@ -29,6 +32,8 @@ SOURCE_DATA_ARCHIVE = join(DATA_ROOT, "source.zip")
 SOURCE_DATA_ROOT = join(DATA_ROOT, "source")
 SOURCE_DATA_DICTIONARY_FILE = join(SOURCE_DATA_ROOT, "dictionary.xlsx")
 
+STRPTIME_FORMAT = "%Y-%m-%d"
+
 
 def download():
     logbook.info("downloading data set ... ")
@@ -42,7 +47,94 @@ def download():
 
 
 def load_data():
-    pass
+    session = sessionmaker(bind=db.engine)()
+    load_subject_matter(session)
+    load_communication_registrant(session)
+    load_communication_dpoh(session)
+    load_client(session)
+
+
+def load_client(session):
+    with open(join(SOURCE_DATA_ROOT, "CLIENT_NMExport.csv")) as w:
+        r = csv.reader(w)
+        header = r.next()
+        b = 0
+        for row in r:
+            session.add(db.Client(
+                client_num=row[0],
+                client_name=row[1]
+            ))
+            b += 1
+            if b % 10000 == 0:
+                session.commit()
+        session.commit()
+
+
+def load_communication_registrant(session):
+    with open(
+        join(SOURCE_DATA_ROOT, "Communication_PrimaryExport.csv")
+    ) as w:
+        r = csv.reader(w)
+        header = r.next()
+        b = 0
+        for row in r:
+            session.add(db.CommunicationRegistrant(
+                comlog_id=row[0],
+                client_num=row[1],
+                registrant_num=row[2],
+                registrant_last_name=row[3],
+                registrant_first_name=row[4],
+                com_date=datetime.strptime(row[5], STRPTIME_FORMAT),
+                reg_type=row[6],
+                submission_date=datetime.strptime(row[7], STRPTIME_FORMAT),
+                posted_date=datetime.strptime(row[8], STRPTIME_FORMAT)
+            ))
+            b += 1
+            if b % 10000 == 0:
+                session.commit()
+        session.commit()
+
+
+def load_communication_dpoh(session):
+    with open(
+        join(SOURCE_DATA_ROOT, "Communication_DPOHExport")
+    ) as w:
+        r = csv.reader()
+        header = csv.next()
+        b = 0
+        for row in r:
+            session.add(db.CommunicationDPOH(
+                comlog_id=row[0],
+                dpoh_last_name=row[1],
+                dpoh_first_name=row[2],
+                dpoh_title=row[3],
+                branch_unit=row[4],
+                other_institution=row[5],
+                institution=row[6]
+            ))
+            b += 1
+            if b % 10000 == 0:
+                session.commit()
+        session.commit()
+
+
+def load_subject_matter(session):
+    with open(
+        join(SOURCE_DATA_ROOT, "Communication_SubjectMattersExport.csv")
+    ) as w:
+        r = csv.reader(w)
+        header = r.next()
+        b = 0
+        for row in r:
+            session.add(db.SubjectMatter(
+                comlog_id=row[0],
+                subject_matter=row[1],
+                other_subject_matter=row[1]
+            ))
+            b += 1
+            if b % 10000 == 0:
+                session.commit()
+        session.commit()
 
 
 if __name__ == "__main__":
