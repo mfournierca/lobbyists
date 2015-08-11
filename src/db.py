@@ -38,15 +38,15 @@ class CommunicationRegistrant(Base):
 
 class CommunicationDPOH(Base):
     __tablename__ = "communication_dpoh"
-    id = Column(Integer, autoincrement=True, primary_key=True)
     comlog_id = Column(
         Integer,
         ForeignKey("communication_registrant.comlog_id"),
         ForeignKey("subject_matter.comlog_id"),
+        primary_key=True,
         nullable=False
     )
-    dpoh_last_name = Column(String, nullable=False)
-    dpoh_first_name = Column(String, nullable=False)
+    dpoh_last_name = Column(String, nullable=False, primary_key=True)
+    dpoh_first_name = Column(String, nullable=False, primary_key=True)
     dpoh_title = Column(String, nullable=False)
     branch_unit = Column(String, nullable=True)
     other_institution = Column(String, nullable=True)
