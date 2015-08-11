@@ -1,15 +1,16 @@
 """Download raw data and load it into the database.
 
 Usage:
-
     data.py [options]
 
 Options:
 
-    --help      Show this help screen
-    --download  Download data
-    --load      Load data into the db
+    --help             Show this help screen
+    --download         Download data
+    --load             Load data into the db
+    --commit-interval  Number of rows to commit at a time [default: 10000]
 """
+
 from urllib import urlretrieve
 from zipfile import ZipFile
 from os.path import join
@@ -48,15 +49,16 @@ def download():
     logbook.info("complete")
 
 
-def load_all():
+def load_all(commit_interval=10000):
     session = sessionmaker(bind=db.engine)()
-    load_subject_matter(session)
-    load_communication_registrant(session)
-    load_communication_dpoh(session)
-    load_client(session)
+    load_subject_matter(session, commit_interval=commit_interval)
+    load_communication_registrant(session, commit_interval=commit_interval)
+    load_communication_dpoh(session, commit_interval=commit_interval)
+    load_client(session, commit_interval=commit_interval)
 
 
-def load_client(session):
+def load_client(session, commit_interval=10000):
+    logbook.info("loading client data")
     with open(join(SOURCE_DATA_ROOT, "CLIENT_NMExport.csv")) as w:
         r = csv.reader(w)
         header = r.next()
@@ -68,12 +70,15 @@ def load_client(session):
                 client_name=row[1]
             ))
             b += 1
-            if b % 10000 == 0:
+            if b % commit_interval == 0:
                 session.commit()
+                logbook.debug("committed {0} rows".format(b))
         session.commit()
+        logbook.debug("committed {0} rows".format(b))
 
 
-def load_communication_registrant(session):
+def load_communication_registrant(session, commit_interval=10000):
+    logbook.info("loading communication registrant data")
     with open(
         join(SOURCE_DATA_ROOT, "Communication_PrimaryExport.csv")
     ) as w:
@@ -94,12 +99,15 @@ def load_communication_registrant(session):
                 posted_date=datetime.strptime(row[8], STRPTIME_FORMAT)
             ))
             b += 1
-            if b % 10000 == 0:
+            if b % commit_interval == 0:
                 session.commit()
+                logbook.debug("committed {0} rows".format(b))
         session.commit()
+        logbook.debug("committed {0} rows".format(b))
 
 
-def load_communication_dpoh(session):
+def load_communication_dpoh(session, commit_interval=10000):
+    logbook.info("loading dpoh communication data")
     with open(
         join(SOURCE_DATA_ROOT, "Communication_DPOHExport.csv")
     ) as w:
@@ -118,12 +126,15 @@ def load_communication_dpoh(session):
                 institution=row[6]
             ))
             b += 1
-            if b % 10000 == 0:
+            if b % commit_interval == 0:
                 session.commit()
+                logbook.debug("committed {0} rows".format(b))
         session.commit()
+        logbook.debug("committed {0} rows".format(b))
 
 
-def load_subject_matter(session):
+def load_subject_matter(session, commit_interval=10000):
+    logbook.info("loading subject matter data")
     with open(
         join(SOURCE_DATA_ROOT, "Communication_SubjectMattersExport.csv")
     ) as w:
@@ -138,9 +149,11 @@ def load_subject_matter(session):
                 other_subject_matter=row[1]
             ))
             b += 1
-            if b % 10000 == 0:
+            if b % commit_interval == 0:
                 session.commit()
+                logbook.debug("committed {0} rows".format(b))
         session.commit()
+        logbook.debug("committed {0} rows".format(b))
 
 
 if __name__ == "__main__":
@@ -148,4 +161,4 @@ if __name__ == "__main__":
     if args["--download"]:
         download()
     if args["--load"]:
-        load_all()
+        load_all(commit_interval=int(args["--commit-interval"]))
