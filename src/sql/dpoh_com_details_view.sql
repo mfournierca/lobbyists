@@ -1,3 +1,4 @@
+DROP VIEW IF EXISTS dpoh_com_details;
 CREATE VIEW dpoh_com_details AS
 SELECT 
 	dpoh.comlog_id AS comlog_id, 
@@ -11,4 +12,4 @@ SELECT
 FROM communication_dpoh AS dpoh
 	INNER JOIN subject_matter AS sm ON sm.comlog_id == dpoh.comlog_id
 	INNER JOIN communication_registrant AS cr ON cr.comlog_id == dpoh.comlog_id
-	INNER JOIN client ON cr.client_num == client.client_num
+	INNER JOIN client ON cr.client_num == client.client_num;
