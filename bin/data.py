@@ -5,10 +5,11 @@ Usage:
 
 Options:
 
-    --help             Show this help screen
-    --download         Download data
-    --load             Load data into the db
-    --commit-interval  Number of rows to commit at a time [default: 10000]
+    --help                        Show this help screen
+    --download                    Download data
+    --load                        Load data into the db
+    --commit-interval=<interval>  Number of rows to commit at a time
+                                  [default: 10000]
 """
 
 from urllib import urlretrieve
