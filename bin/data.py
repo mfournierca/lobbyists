@@ -69,8 +69,7 @@ def run_sql_scripts():
     for script in scripts:
         logbook.debug("running {0}".format(script))
         sql = open(script, "r")
-        commands = "".join(sql.readlines())
-        cur.execute(commands)
+        conn.executescript("".join(sql.readlines()))
 
 
 def _load(session, csvfile, row_creator, commit_interval=10000):
