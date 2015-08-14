@@ -51,24 +51,26 @@ def download():
 
 
 def load_all(commit_interval=10000):
-    session = db.make_session()
+    session = db.make_sqlalchemy_session()
     load_subject_matter(session, commit_interval=commit_interval)
     load_communication_registrant(session, commit_interval=commit_interval)
     load_communication_dpoh(session, commit_interval=commit_interval)
     load_client(session, commit_interval=commit_interval)
-    run_sql_scripts(session)
+    run_sql_scripts()
 
 
-def run_sql_scripts(session):
-    cur = session.cursor()
+def run_sql_scripts():
+    logbook.info("running sql scripts")
     scripts = [
         join(SQL_SCRIPTS_DIR, "dpoh_com_details_view.sql"),
         join(SQL_SCRIPTS_DIR, "create_indices.sql")
     ]
+    conn = db.get_raw_connection()
     for script in scripts:
+        logbook.debug("running {0}".format(script))
         sql = open(script, "r")
-        command = "".join(sql.readlines())
-        cur.execute(command)
+        commands = "".join(sql.readlines())
+        cur.execute(commands)
 
 
 def _load(session, csvfile, row_creator, commit_interval=10000):

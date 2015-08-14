@@ -6,6 +6,8 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 
+import sqlite3
+
 SQLITE_DB_PATH = join(DATA_ROOT, "sqlite.db")
 
 Base = declarative_base()
@@ -60,9 +62,14 @@ class Client(Base):
     client_name = Column(String, nullable=False)
 
 
-engine = create_engine("sqlite:///{0}".format(SQLITE_DB_PATH))
-Base.metadata.create_all(engine)
+ENGINE = create_engine("sqlite:///{0}".format(SQLITE_DB_PATH))
+Base.metadata.create_all(ENGINE)
 
 
-def make_session():
-    return sessionmaker(bind=engine)()
+def make_sqlalchemy_session():
+    return sessionmaker(bind=ENGINE)()
+
+
+def get_raw_connection():
+    return sqlite3.connect(SQLITE_DB_PATH)
+
