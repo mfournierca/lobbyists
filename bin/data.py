@@ -16,7 +16,6 @@ from urllib import urlretrieve
 from zipfile import ZipFile
 from os.path import join
 from docopt import docopt
-from sqlalchemy.orm import sessionmaker
 from datetime import datetime
 
 import logbook
@@ -24,7 +23,7 @@ import csv
 
 from src.constants import DATA_ROOT, SQL_SCRIPTS_DIR
 from src import db
-from src.common import clean_name
+from src import common
 
 SOURCE_DATA_URL = (
     "http://29040.vws.magma.ca/od-do_dl.php?f=Communications_OCL_CAL.zip"
@@ -103,46 +102,50 @@ def load_client(session, commit_interval=10000):
     )
 
 
-def load_communication_registrant(session, commit_interval=10000):
-    logbook.info("loading communication registrant data")
-
-    row_creator = lambda row: db.CommunicationRegistrant(
+def _create_communication_registrant(row):
+    lastname, firstname = common.clean_last_and_first_name(row[3], row[4])
+    return db.CommunicationRegistrant(
         comlog_id=row[0],
         client_num=row[1],
         registrant_num=row[2],
-        registrant_last_name=clean_name(row[3]),
-        registrant_first_name=clean_name(row[4]),
+        registrant_last_name=lastname,
+        registrant_first_name=firstname,
         com_date=datetime.strptime(row[5], STRPTIME_FORMAT),
         reg_type=row[6],
         submission_date=datetime.strptime(row[7], STRPTIME_FORMAT),
         posted_date=datetime.strptime(row[8], STRPTIME_FORMAT)
     )
 
+
+def load_communication_registrant(session, commit_interval=10000):
+    logbook.info("loading communication registrant data")
     _load(
         session,
         join(SOURCE_DATA_ROOT, "Communication_PrimaryExport.csv"),
-        row_creator,
+        _create_communication_registrant,
         commit_interval=commit_interval
     )
 
 
-def load_communication_dpoh(session, commit_interval=10000):
-    logbook.info("loading dpoh communication data")
-
-    row_creator = lambda row: db.CommunicationDPOH(
+def _create_communication_dpoh(row):
+    lastname, firstname = common.clean_last_and_first_name(row[1], row[2])
+    return db.CommunicationDPOH(
         comlog_id=row[0],
-        dpoh_last_name=clean_name(row[1]),
-        dpoh_first_name=clean_name(row[2]),
+        dpoh_last_name=lastname,
+        dpoh_first_name=firstname,
         dpoh_title=row[3],
         branch_unit=row[4],
         other_institution=row[5],
         institution=row[6]
     )
 
+
+def load_communication_dpoh(session, commit_interval=10000):
+    logbook.info("loading dpoh communication data")
     _load(
         session,
         join(SOURCE_DATA_ROOT, "Communication_DPOHExport.csv"),
-        row_creator,
+        _create_communication_dpoh,
         commit_interval=commit_interval
     )
 
