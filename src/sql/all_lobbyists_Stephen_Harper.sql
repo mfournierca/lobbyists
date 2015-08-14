@@ -1,4 +1,9 @@
-SELECT cr.comlog_id, cr.registrant_first_name, cr.registrant_last_name, cl.client_name, COUNT(*) AS number_of_meetings
+SELECT
+    cr.comlog_id,
+    cr.registrant_first_name,
+    cr.registrant_last_name,
+    cl.client_name,
+    COUNT(*) AS number_of_meetings
 FROM communication_dpoh AS cd
 	INNER JOIN communication_registrant AS cr ON cd.comlog_id == cr.comlog_id
 	INNER JOIN client AS cl ON cr.client_num == cl.client_num
