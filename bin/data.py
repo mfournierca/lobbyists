@@ -24,6 +24,7 @@ import csv
 
 from src.constants import DATA_ROOT
 from src import db
+from src.common import clean_name
 
 SOURCE_DATA_URL = (
     "http://29040.vws.magma.ca/od-do_dl.php?f=Communications_OCL_CAL.zip"
@@ -96,8 +97,8 @@ def load_communication_registrant(session, commit_interval=10000):
         comlog_id=row[0],
         client_num=row[1],
         registrant_num=row[2],
-        registrant_last_name=row[3],
-        registrant_first_name=row[4],
+        registrant_last_name=clean_name(row[3]),
+        registrant_first_name=clean_name(row[4]),
         com_date=datetime.strptime(row[5], STRPTIME_FORMAT),
         reg_type=row[6],
         submission_date=datetime.strptime(row[7], STRPTIME_FORMAT),
@@ -117,8 +118,8 @@ def load_communication_dpoh(session, commit_interval=10000):
 
     row_creator = lambda row: db.CommunicationDPOH(
         comlog_id=row[0],
-        dpoh_last_name=row[1],
-        dpoh_first_name=row[2],
+        dpoh_last_name=clean_name(row[1]),
+        dpoh_first_name=clean_name(row[2]),
         dpoh_title=row[3],
         branch_unit=row[4],
         other_institution=row[5],
