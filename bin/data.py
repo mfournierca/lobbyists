@@ -22,7 +22,7 @@ from datetime import datetime
 import logbook
 import csv
 
-from src.constants import DATA_ROOT
+from src.constants import DATA_ROOT, SQL_SCRIPTS_DIR
 from src import db
 from src.common import clean_name
 
@@ -52,11 +52,24 @@ def download():
 
 
 def load_all(commit_interval=10000):
-    session = sessionmaker(bind=db.engine)()
+    session = db.make_session()
     load_subject_matter(session, commit_interval=commit_interval)
     load_communication_registrant(session, commit_interval=commit_interval)
     load_communication_dpoh(session, commit_interval=commit_interval)
     load_client(session, commit_interval=commit_interval)
+    run_sql_scripts(session)
+
+
+def run_sql_scripts(session):
+    cur = session.cursor()
+    scripts = [
+        join(SQL_SCRIPTS_DIR, "dpoh_com_details_view.sql"),
+        join(SQL_SCRIPTS_DIR, "create_indices.sql")
+    ]
+    for script in scripts:
+        sql = open(script, "r")
+        command = "".join(sql.readlines())
+        cur.execute(command)
 
 
 def _load(session, csvfile, row_creator, commit_interval=10000):
