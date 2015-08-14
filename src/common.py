@@ -1,3 +1,5 @@
+import re
+
 REPLACE = [
     ".",
     " the ",
@@ -5,7 +7,15 @@ REPLACE = [
     " rt ",
     " hon ",
     " honorable "
- ]
+]
+
+SUB = [
+    "^the ",
+    "^right ",
+    "^rt ",
+    "^hon ",
+    "^honorable "
+]
 
 
 def clean_name(name):
@@ -15,6 +25,8 @@ def clean_name(name):
     name = name.lower()
     for i in REPLACE:
         name = name.replace(i, "")
+    for i in SUB:
+        name = re.sub(i, "", name)
     name = name.title()
     return name
 
