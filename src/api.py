@@ -10,23 +10,40 @@ Options:
 import logbook
 
 from docopt import docopt
-from flask import Flask
+from flask import Flask, Response
 from src import db
+from json import dumps
+from copy import copy
 
 from src.common import clean_name
 
 APP = Flask(__name__)
-CONN = db.make_session()
+SESSION = db.make_sqlalchemy_session()
+
+BASE_RESPONSE = {
+    "status": True,
+    "message": "",
+    "content": None
+}
 
 
 @APP.route("/publicservant/<lastname>_<firstname>/itinerary")
-def itinerary(lastname=None, firstname=None):
+def publicservant_itinerary(lastname=None, firstname=None, limit=100):
     """Get the itinerary of lobbyist meetings for a given public servant."""
     lastname = clean_name(lastname) if lastname else ""
     firstname = clean_name(firstname) if firstname else ""
-    cur = CONN.cursor()
 
-    return "{0}, {1}".format(lastname, firstname)
+    query = SESSION.query(db.DPOHCommDetailsView)
+    query = query.filter(db.DPOHCommDetailsView.dpoh_last_name == lastname)
+    query = query.filter(db.DPOHCommDetailsView.dpoh_first_name == firstname)
+    query.order_by(db.DPOHCommDetailsView.com_date)
+    query.limit(limit)
+
+    data = copy(BASE_RESPONSE)
+    data["content"] = [r.to_dict() for r in query.all()]
+    data = dumps(data)
+
+    return Response(data, status=200, mimetype="application/json")
 
 
 if __name__ == "__main__":
