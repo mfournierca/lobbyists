@@ -32,10 +32,8 @@ class DPOHCommDetailsView(Base):
     client_name = Column(String, nullable=False)
     subject_matter = Column(String, nullable=False)
 
-    def to_dict(self):
-        d = {c.name: getattr(self, c.name) for c in self.__table__.columns}
-        d["com_date"] = datetime.strftime(d["com_date"], TIME_FORMAT)
-        return d
+    def com_date_str(self):
+        return datetime.strftime(self.com_date, TIME_FORMAT)
 
 
 class SubjectMatter(Base):

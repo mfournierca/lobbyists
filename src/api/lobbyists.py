@@ -21,11 +21,6 @@ from src.common import clean_name
 APP = Flask(__name__)
 SESSION = db.make_sqlalchemy_session()
 BASE_PATH = "/api/v1/{0}"
-BASE_RESPONSE = {
-    "status": True,
-    "message": "",
-    "data": None
-}
 
 
 @APP.route(BASE_PATH.format("publicservant/<lastname>_<firstname>/itinerary"))
@@ -46,7 +41,7 @@ def publicservant_itinerary(lastname=None, firstname=None, limit=100):
         "itinerary": defaultdict(list)
     }
     for r in query.all():
-        data["itinerary"][r.com_date].append({
+        data["itinerary"][r.com_date_str()].append({
             "reg_first_name": r.registrant_first_name,
             "reg_last_name": r.registrant_last_name,
             "comlog_id": r.comlog_id,
@@ -54,11 +49,9 @@ def publicservant_itinerary(lastname=None, firstname=None, limit=100):
             "client_name": r.client_name
         })
 
-    response = copy(BASE_RESPONSE)
-    response["data"] = data
-    response = dumps(response)
-
-    return Response(response, status=200, mimetype="application/json")
+    print(data)
+    data = dumps(data)
+    return Response(data, status=200, mimetype="application/json")
 
 
 if __name__ == "__main__":
