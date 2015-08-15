@@ -11,6 +11,7 @@ import logbook
 
 from docopt import docopt
 from flask import Flask, Response
+from flask.ext.cors import CORS
 from src import db
 from json import dumps
 from copy import copy
@@ -19,9 +20,12 @@ from collections import defaultdict
 from src.common import clean_name
 
 APP = Flask(__name__)
+CORS(APP)
+
 SESSION = db.make_sqlalchemy_session()
 BASE_PATH = "/api/v1/{0}"
 PORT = 5001
+
 
 @APP.route(BASE_PATH.format("publicservant/<lastname>_<firstname>/itinerary"))
 def publicservant_itinerary(lastname=None, firstname=None, limit=100):

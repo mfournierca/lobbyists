@@ -12,6 +12,7 @@ from docopt import docopt
 from flask import Flask, render_template
 
 APP = Flask(__name__)
+
 BASE_PATH = "/app/v1/{0}"
 PORT = 8081
 
