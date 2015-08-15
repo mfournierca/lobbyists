@@ -14,20 +14,21 @@ from flask import Flask, Response
 from src import db
 from json import dumps
 from copy import copy
+from collections import defaultdict
 
 from src.common import clean_name
 
 APP = Flask(__name__)
 SESSION = db.make_sqlalchemy_session()
-
+BASE_PATH = "/api/v1/{0}"
 BASE_RESPONSE = {
     "status": True,
     "message": "",
-    "content": None
+    "data": None
 }
 
 
-@APP.route("/publicservant/<lastname>_<firstname>/itinerary")
+@APP.route(BASE_PATH.format("publicservant/<lastname>_<firstname>/itinerary"))
 def publicservant_itinerary(lastname=None, firstname=None, limit=100):
     """Get the itinerary of lobbyist meetings for a given public servant."""
     lastname = clean_name(lastname) if lastname else ""
@@ -39,11 +40,25 @@ def publicservant_itinerary(lastname=None, firstname=None, limit=100):
     query.order_by(db.DPOHCommDetailsView.com_date)
     query.limit(limit)
 
-    data = copy(BASE_RESPONSE)
-    data["content"] = [r.to_dict() for r in query.all()]
-    data = dumps(data)
+    data = {
+        "dpoh_last_name": lastname,
+        "dpoh_first_name": firstname,
+        "itinerary": defaultdict(list)
+    }
+    for r in query.all():
+        data["itinerary"][r.com_date].append({
+            "reg_first_name": r.registrant_first_name,
+            "reg_last_name": r.registrant_last_name,
+            "comlog_id": r.comlog_id,
+            "subject_matter": r.subject_matter,
+            "client_name": r.client_name
+        })
 
-    return Response(data, status=200, mimetype="application/json")
+    response = copy(BASE_RESPONSE)
+    response["data"] = data
+    response = dumps(response)
+
+    return Response(response, status=200, mimetype="application/json")
 
 
 if __name__ == "__main__":
