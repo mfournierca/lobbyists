@@ -79,18 +79,17 @@ svg.selectAll(".month")
     .attr("class", "month")
     .attr("d", monthPath);
 
-d3.json("dji.json", function(error, json) {
-  if (error) throw error;
+d3.json(
+  "http://localhost:5001/api/v1/publicservant/Harper_Stephen/itinerary",
+  function(error, json) {
+    if (error) throw error;
 
-  var data = d3.nest()
-    .key(function(d) { return d.Date; })
-    .rollup(function(d) { return (d[0].Close - d[0].Open) / d[0].Open; })
-    .map(json["data"]);
+    var data = json;
 
-  rect.filter(function(d) { return d in data; })
-      .attr("class", function(d) { return "day " + color(data[d]); })
-    .select("title")
-      .text(function(d) { return d + ": " + percent(data[d]); });
+    rect.filter(function(d) { return d in data; })
+        .attr("class", function(d) { return "day " + color(data[d].length); })
+      .select("title")
+        .text(function(d) { return d + ": " + percent(data[d]); });
 });
 
 function monthPath(t0) {

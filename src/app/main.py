@@ -15,6 +15,7 @@ APP = Flask(__name__)
 BASE_PATH = "/app/v1/{0}"
 PORT = 8081
 
+
 @APP.route(BASE_PATH.format("itinerary"))
 def itinerary():
     """Home page of the web app.
@@ -22,7 +23,7 @@ def itinerary():
     The view and controller are managed by javascript and d3. The model is the
     api.
     """
-    return render_template("itinerary.html")
+    return render_template("itinerary.html.j2")
 
 
 if __name__ == "__main__":
