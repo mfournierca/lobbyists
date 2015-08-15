@@ -32,6 +32,8 @@ body {
 
 </style>
 <body>
+<div id="calendar"></div>
+<div id="details"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
 <script>
 
@@ -43,10 +45,10 @@ var percent = d3.format(".1%"),
     format = d3.time.format("%Y-%m-%d");
 
 var color = d3.scale.quantize()
-    .domain([-.05, .05])
+    .domain([0, 11])
     .range(d3.range(11).map(function(d) { return "q" + d + "-11"; }));
 
-var svg = d3.select("body").selectAll("svg")
+var svg = d3.select("#calendar").selectAll("svg")
     .data(d3.range(2009, 2011))
   .enter().append("svg")
     .attr("width", width)
@@ -84,12 +86,13 @@ d3.json(
   function(error, json) {
     if (error) throw error;
 
-    var data = json;
+    var data = json["itinerary"];
 
     rect.filter(function(d) { return d in data; })
         .attr("class", function(d) { return "day " + color(data[d].length); })
+        .on("click", function(d) { alert(data[d][0]["client_name"])})
       .select("title")
-        .text(function(d) { return d + ": " + percent(data[d]); });
+        .text(function(d) { return d + ": " + data[d].length; });
 });
 
 function monthPath(t0) {
