@@ -14,7 +14,7 @@ from flask import Flask, Response
 from flask.ext.cors import CORS
 from src import db
 from json import dumps
-from copy import copy
+from sqlalchemy import asc
 from collections import defaultdict
 
 from src.common import clean_name
@@ -27,7 +27,6 @@ BASE_PATH = "/api/v1/{0}"
 PORT = 5001
 
 
-@APP.route(BASE_PATH.format("publicservant/<lastname>_<firstname>/itinerary"))
 def publicservant_itinerary(lastname=None, firstname=None, limit=100):
     """Get the itinerary of lobbyist meetings for a given public servant."""
     lastname = clean_name(lastname) if lastname else ""
@@ -52,15 +51,35 @@ def publicservant_itinerary(lastname=None, firstname=None, limit=100):
             "subject_matter": r.subject_matter,
             "client_name": r.client_name
         })
+    return data
 
+
+@APP.route(BASE_PATH.format("publicservant/<lastname>_<firstname>/itinerary"))
+def _publicservant_itinerary(lastname=None, firstname=None, limit=100):
+    data = publicservant_itinerary(
+        lastname=lastname,
+        firstname=firstname,
+        limit=limit
+    )
     data = dumps(data)
     return Response(data, status=200, mimetype="application/json")
 
 
-@APP.route(BASE_PATH.format("publicservant/names")
-def publicservant_names():
-    query = SESSION.query(db.CommunicationDPOH)
-    query = query.filter()
+def publicservant_names(limit=1000):
+    query = SESSION.query(
+        db.CommunicationDPOH.dpoh_last_name,
+        db.CommunicationDPOH.dpoh_first_name)
+    query = query.distinct()
+    query = query.order_by(asc(db.CommunicationDPOH.dpoh_last_name))
+    query.limit(limit)
+    return [(r.dpoh_last_name, r.dpoh_first_name) for r in query.all()]
+
+
+@APP.route(BASE_PATH.format("publicservant/names"))
+def _publicservant_names(limit=1000):
+    data = publicservant_names(limit=limit)
+    data = dumps(data)
+    return Response(data, status=200, mimetype="application/json")
 
 
 if __name__ == "__main__":
