@@ -21,7 +21,7 @@ from src.common import clean_name
 APP = Flask(__name__)
 SESSION = db.make_sqlalchemy_session()
 BASE_PATH = "/api/v1/{0}"
-
+PORT = 5001
 
 @APP.route(BASE_PATH.format("publicservant/<lastname>_<firstname>/itinerary"))
 def publicservant_itinerary(lastname=None, firstname=None, limit=100):
@@ -49,7 +49,6 @@ def publicservant_itinerary(lastname=None, firstname=None, limit=100):
             "client_name": r.client_name
         })
 
-    print(data)
     data = dumps(data)
     return Response(data, status=200, mimetype="application/json")
 
@@ -58,5 +57,5 @@ if __name__ == "__main__":
     args = docopt(__doc__)
     if args["--debug"]:
         APP.debug = True
-    APP.run()
+    APP.run(port=PORT)
 
