@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<head>
 <meta charset="utf-8">
 <style>
 
@@ -31,7 +32,9 @@ body {
 .RdYlGn .q10-11{fill:rgb(0,104,55)}
 
 </style>
+</head>
 <body>
+<div id="controls"></div>
 <div id="calendar"></div>
 <div id="details"></div>
 
@@ -106,6 +109,10 @@ d3.json(
         selection.append("p")
           .text(function(e) {
             return e["client_name"]
+          });
+        selection.append("p")
+          .text(function(e) {
+            return e["reg_last_name"] + ", " + e["reg_first_name"]
           });
     });
 });

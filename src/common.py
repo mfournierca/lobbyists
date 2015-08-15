@@ -6,7 +6,9 @@ REPLACE = [
     " right ",
     " rt ",
     " hon ",
-    " honorable "
+    " honorable ",
+    " honourable ",
+    " mp "
 ]
 
 SUB = [
@@ -14,7 +16,9 @@ SUB = [
     "^right ",
     "^rt ",
     "^hon ",
-    "^honorable "
+    "^honorable ",
+    "^honourable ",
+    "^mp "
 ]
 
 

@@ -57,6 +57,12 @@ def publicservant_itinerary(lastname=None, firstname=None, limit=100):
     return Response(data, status=200, mimetype="application/json")
 
 
+@APP.route(BASE_PATH.format("publicservant/names")
+def publicservant_names():
+    query = SESSION.query(db.CommunicationDPOH)
+    query = query.filter()
+
+
 if __name__ == "__main__":
     args = docopt(__doc__)
     if args["--debug"]:
