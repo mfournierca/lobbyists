@@ -7,7 +7,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 
-from src.constants import DATA_ROOT
+from src.constants import DATA_ROOT, TIME_FORMAT
 
 SQLITE_DB_PATH = join(DATA_ROOT, "sqlite.db")
 
@@ -34,7 +34,7 @@ class DPOHCommDetailsView(Base):
 
     def to_dict(self):
         d = {c.name: getattr(self, c.name) for c in self.__table__.columns}
-        d["com_date"] = datetime.strftime(d["com_date"], "%Y-%m-%d")
+        d["com_date"] = datetime.strftime(d["com_date"], TIME_FORMAT)
         return d
 
 
