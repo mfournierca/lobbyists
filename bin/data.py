@@ -21,7 +21,7 @@ from datetime import datetime
 import logbook
 import csv
 
-from src.constants import DATA_ROOT, SQL_SCRIPTS_DIR
+from src.constants import DATA_ROOT, SQL_SCRIPTS_DIR, TIME_FORMAT
 from src import db
 from src import common
 
@@ -35,8 +35,6 @@ SOURCE_DATA_DICTIONARY_URL = (
 SOURCE_DATA_ARCHIVE = join(DATA_ROOT, "source.zip")
 SOURCE_DATA_ROOT = join(DATA_ROOT, "source")
 SOURCE_DATA_DICTIONARY_FILE = join(SOURCE_DATA_ROOT, "dictionary.xlsx")
-
-STRPTIME_FORMAT = "%Y-%m-%d"
 
 
 def download():
@@ -111,10 +109,10 @@ def _create_communication_registrant(row):
         registrant_num=row[2],
         registrant_last_name=lastname,
         registrant_first_name=firstname,
-        com_date=datetime.strptime(row[5], STRPTIME_FORMAT),
+        com_date=datetime.strptime(row[5], TIME_FORMAT),
         reg_type=row[6],
-        submission_date=datetime.strptime(row[7], STRPTIME_FORMAT),
-        posted_date=datetime.strptime(row[8], STRPTIME_FORMAT)
+        submission_date=datetime.strptime(row[7], TIME_FORMAT),
+        posted_date=datetime.strptime(row[8], TIME_FORMAT)
     )
 
 
