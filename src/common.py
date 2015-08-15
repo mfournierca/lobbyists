@@ -1,5 +1,9 @@
 import re
 
+import pandas as pd
+import Levenshtein
+
+
 REPLACE = [
     ".",
     " the ",
@@ -8,7 +12,8 @@ REPLACE = [
     " hon ",
     " honorable ",
     " honourable ",
-    " mp "
+    " mp ",
+    " pc "
 ]
 
 SUB = [
@@ -18,7 +23,8 @@ SUB = [
     "^hon ",
     "^honorable ",
     "^honourable ",
-    "^mp "
+    "^mp ",
+    "^pc "
 ]
 
 
@@ -41,3 +47,5 @@ def clean_last_and_first_name(lastname, firstname):
     if lastname == "Harper" and firstname in ["Stephen", "Stepen", "Steven"]:
         firstname = "Stephen"
     return lastname, firstname
+
+
