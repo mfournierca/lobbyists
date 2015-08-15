@@ -1,8 +1,11 @@
 import sqlite3
+import pandas
+import numpy
+
 from os.path import join
 from datetime import datetime
 
-from sqlalchemy import Column, ForeignKey, Integer, String, Date
+from sqlalchemy import Column, ForeignKey, Integer, String, Date, func
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
@@ -111,3 +114,30 @@ def make_sqlalchemy_session():
 def get_raw_connection():
     return sqlite3.connect(SQLITE_DB_PATH)
 
+
+def fix_mispelled_dpoh_names():
+    session = make_sqlalchemy_session()
+    query = session.query(
+        CommunicationDPOH.dpoh_last_name,
+        CommunicationDPOH.dpoh_first_name,
+        func.count(CommunicationDPOH.comlog_id))
+    query = query.group_by(
+        CommunicationDPOH.dpoh_last_name,
+        CommunicationDPOH.dpoh_first_name
+    )
+
+
+def fix_mispelled_registrant_names():
+    pass
+
+
+def find_correct_names(names):
+    """Given a list of (lastname, firstname, frequency) tuples find the correct
+    spelling of each name.
+
+    We accomplish this in 2 steps:
+
+    - Cluster the names so that mispellings are in the same cluster
+    - Take the most frequent spelling from each cluster and consider it correct
+    """
+    df = pandas.DataFrame(names, columns=["lastname", "firstname", "count"])
