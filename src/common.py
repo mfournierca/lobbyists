@@ -6,6 +6,7 @@ import Levenshtein
 
 REPLACE = [
     ".",
+    ",",
     " the ",
     " right ",
     " rt ",
