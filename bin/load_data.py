@@ -19,8 +19,8 @@ import logbook
 import csv
 
 from src.constants import SOURCE_DATA_ROOT, SQL_SCRIPTS_DIR, TIME_FORMAT
-from src import db
-from src import common
+from src.db import db
+from src.data import clean
 
 
 def load_all(commit_interval=10000):
@@ -77,7 +77,7 @@ def load_client(session, commit_interval=10000):
 
 
 def _create_communication_registrant(row):
-    lastname, firstname = common.clean_last_and_first_name(row[3], row[4])
+    lastname, firstname = clean.clean_last_and_first_name(row[3], row[4])
     return db.CommunicationRegistrant(
         comlog_id=row[0],
         client_num=row[1],
@@ -102,7 +102,7 @@ def load_communication_registrant(session, commit_interval=10000):
 
 
 def _create_communication_dpoh(row):
-    lastname, firstname = common.clean_last_and_first_name(row[1], row[2])
+    lastname, firstname = clean.clean_last_and_first_name(row[1], row[2])
     return db.CommunicationDPOH(
         comlog_id=row[0],
         dpoh_last_name=lastname,
