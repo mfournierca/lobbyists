@@ -93,7 +93,7 @@ class TestBuildDistanceMatrix(TestCase):
                 ["zzz", "abb", 1],
                 ["zzz", "bbb", 1]
             ],
-            columns=["lastname", "lastname", "count"]
+            columns=["lastname", "firstname", "count"]
         )
         self.df["name"] = self.df["lastname"] + self.df["firstname"]
 
