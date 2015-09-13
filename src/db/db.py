@@ -14,6 +14,10 @@ SQLITE_DB_PATH = join(DATA_ROOT, "sqlite.db")
 
 Base = declarative_base()
 
+#
+# tables
+#
+
 
 class SubjectMatter(Base):
     """Subject of communications.
@@ -79,11 +83,19 @@ class Client(Base):
     client_name = Column(String, nullable=False)
 
 
+#
+# init db
+#
+
 ENGINE = create_engine("sqlite:///{0}".format(SQLITE_DB_PATH))
 Base.metadata.create_all(ENGINE)
 
+#
+# views
+# views declared here so they are not created by create_all()
+#
 
-# view is declared here so it is not created by create_all()
+
 class DPOHCommDetailsView(Base):
     """A view containing details of each communication that a DPOH participated
     in.
@@ -105,6 +117,10 @@ class DPOHCommDetailsView(Base):
     def com_date_str(self):
         return datetime.strftime(self.com_date, TIME_FORMAT)
 
+
+#
+# util
+#
 
 def make_sqlalchemy_session():
     return sessionmaker(bind=ENGINE)()
