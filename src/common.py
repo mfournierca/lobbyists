@@ -4,29 +4,24 @@ import pandas as pd
 import Levenshtein
 
 
-REPLACE = [
+PUNCTUATION = [
     ".",
-    ",",
-    " the ",
-    " right ",
-    " rt ",
-    " hon ",
-    " honorable ",
-    " honourable ",
-    " mp ",
-    " pc "
+    ","
 ]
 
-SUB = [
-    "^the ",
-    "^right ",
-    "^rt ",
-    "^hon ",
-    "^honorable ",
-    "^honourable ",
-    "^mp ",
-    "^pc "
+REPLACE = [
+    "the",
+    "right",
+    "rt",
+    "hon",
+    "honorable",
+    "honourable",
+    "mp",
+    "pc"
 ]
+
+SUB = ["^" + r + "\s*" for r in REPLACE]
+SUB += ["\s*" + r + "\s*" for r in REPLACE]
 
 
 def clean_name(name):
@@ -34,8 +29,6 @@ def clean_name(name):
     space-delimited words."""
 
     name = name.lower()
-    for i in REPLACE:
-        name = name.replace(i, "")
     for i in SUB:
         name = re.sub(i, "", name)
     name = name.title()
@@ -43,10 +36,5 @@ def clean_name(name):
 
 
 def clean_last_and_first_name(lastname, firstname):
-    lastname = clean_name(lastname)
-    firstname = clean_name(firstname)
-    if lastname == "Harper" and firstname in ["Stephen", "Stepen", "Steven"]:
-        firstname = "Stephen"
-    return lastname, firstname
-
+    return clean_name(lastname), clean_name(firstname)
 
