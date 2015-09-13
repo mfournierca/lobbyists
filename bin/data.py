@@ -1,7 +1,8 @@
 """Download raw data and load it into the database.
 
 Usage:
-    data.py [options]
+    data.py --help
+    data.py (--download|--load) [options]
 
 Options:
 
