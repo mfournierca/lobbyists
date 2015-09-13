@@ -57,41 +57,43 @@ class TestFindCorrectNames(TestCase):
 
         result = find_correct_names(names)
 
-        print(names)
-        print(result)
+        expected = DataFrame()
+        expected["correct_lastname"] = Series([
+            "Abbott",
+            "Abbott",
+            "Abbott",
+            "Abbott",
+            "Hoffman",
+            "Abernethy-Gillis",
+            "Ablonczy",
+            "Ablonczy",
+            "Ablonczy",
+            "Ablonczy"
+        ])
+        expected["correct_firstname"] = Series([
+            "Jim",
+            "Jim",
+            "Jim",
+            "Connie",
+            "Abby",
+            "Robyn",
+            "Diane",
+            "Diane",
+            "Diane",
+            "Honourable Diane"
+        ])
+
+        print(expected[["correct_lastname", "correct_firstname"]])
+        print(result[["correct_lastname", "correct_firstname"]])
 
         self.assertTrue(
             (
-                result["correct_firstname"] ==
-                Series([
-                    "Jim",
-                    "Jim",
-                    "Jim",
-                    "Connie",
-                    "Abby",
-                    "Robyn",
-                    "Diane",
-                    "Diane",
-                    "Diane",
-                    "Diane"
-                ])
+                result["correct_firstname"] == expected["correct_firstname"]
             ).all()
         )
         self.assertTrue(
             (
-                result["correct_lastname"] ==
-                Series([
-                    "Abbott",
-                    "Abbott",
-                    "Abbott",
-                    "Abbott",
-                    "Hoffman",
-                    "Abernethy-Gillis",
-                    "Ablonczy",
-                    "Ablonczy",
-                    "Ablonczy",
-                    "Ablonczy"
-                ])
+                result["correct_lastname"] == expected["correct_lastname"]
             ).all()
         )
 
