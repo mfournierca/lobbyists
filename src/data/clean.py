@@ -6,23 +6,19 @@ import Levenshtein
 
 
 def find_correct_names(names):
-    """Given a list of (lastname, firstname, frequency) tuples find the correct
+    """Given a list of (lastname, firstname, count) tuples find the correct
     spelling of each name.
 
     We accomplish this in 2 steps:
 
-    - Cluster the names so that mispellings are in the same cluster
+    - Cluster the names so that different spellings are in the same cluster
     - Take the most frequent spelling from each cluster and consider it correct
     """
 
-    # build dataframe
     df = pandas.DataFrame(names, columns=["lastname", "firstname", "count"])
-
-    # distance will be measured off of full name
     df["name"] = df["lastname"] + df["firstname"]
 
-    # cluster and label
-    df = _cluster_and_label(df)
+    df = _cluster_and_label(df, column="name")
 
     # find the index of the max count within each label
     correct = df.groupby("label")["count"].idxmax()
@@ -40,16 +36,12 @@ def _cluster_and_label(df, column="name", label="label"):
         lambda x: "".join([i for i in x if 0 < ord(i) < 127])
     )
 
-    # build distance matrix
     dist = _build_distance_matrix(df)
 
-    # find labels
     dbscan = cluster.DBSCAN(eps=3, metric="precomputed", min_samples=1)
     labels = dbscan.fit_predict(dist)
 
-    # add labels
     df[label] = labels
-
     return df
 
 
