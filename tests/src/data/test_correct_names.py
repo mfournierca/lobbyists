@@ -57,6 +57,9 @@ class TestFindCorrectNames(TestCase):
 
         result = find_correct_names(names)
 
+        print(names)
+        print(result)
+
         self.assertTrue(
             (
                 result["correct_firstname"] ==
