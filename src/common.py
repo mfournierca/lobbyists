@@ -25,8 +25,8 @@ SUB += ["\s+" + r + "\s+" for r in REPLACE]
 
 
 def clean_name(name):
-    """Standard name-cleaning routine. Should accept any number of
-    space-delimited words."""
+    """Clean the provided name. Capitalize properly, remove punctuation,
+    titles and pronouns. """
 
     name = name.lower()
     name = name.strip()
