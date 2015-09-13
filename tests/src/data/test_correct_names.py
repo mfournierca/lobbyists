@@ -15,7 +15,10 @@ class TestFindCorrectNames(TestCase):
         pass
 
     def setUp(self):
-        self.names = [
+        pass
+
+    def test_simple_names(self):
+        names = [
             ["zzz", "aaa", 2],
             ["zzz", "aab", 1],
             ["xxx", "ddd", 2],
@@ -23,34 +26,69 @@ class TestFindCorrectNames(TestCase):
             ["yyy", "fff", 1]
         ]
 
-        self.expected = DataFrame(
-            self.names,
-            columns=["lastname", "firstname", "count"]
-        )
-        self.expected["correct_firstname"] = Series(
-            ["aaa", "aaa", "ddd", "ddd", "fff"]
-        )
-        self.expected["correct_lastname"] = Series(
-            ["zzz", "zzz", "xxx", "xxx", "yyy"]
-        )
-
-    def test_correct_names(self):
-
-        result = find_correct_names(self.names)
-
-        print(self.expected)
-        print(result)
+        result = find_correct_names(names)
 
         self.assertTrue(
             (
                 result["correct_firstname"] ==
-                self.expected["correct_firstname"]
+                Series(["aaa", "aaa", "ddd", "ddd", "fff"])
             ).all()
         )
         self.assertTrue(
             (
                 result["correct_lastname"] ==
-                self.expected["correct_lastname"]
+                Series(["zzz", "zzz", "xxx", "xxx", "yyy"])
+            ).all()
+        )
+
+    def test_real_names(self):
+        names = [
+            ["Abbot", "Jim", "2"],
+            ["Abbott", "James", "1"],
+            ["Abbott", "Jim", "25"],
+            ["Abbott", "Connie", "1"],
+            ["Hoffman", "Abby", "1"],
+            ["Abernethy-Gillis", "Robyn", "1"],
+            ["Ablonczy", "Diane", "110"],
+            ["Ablonczy", "Dianne", "1"],
+            ["Ablonsky", "Diane", "1"],
+            ["Ablonczy", "Honourable Diane", "2"]
+        ]
+
+        result = find_correct_names(names)
+
+        self.assertTrue(
+            (
+                result["correct_firstname"] ==
+                Series([
+                    "Jim",
+                    "Jim",
+                    "Jim",
+                    "Connie",
+                    "Abby",
+                    "Robyn",
+                    "Diane",
+                    "Diane",
+                    "Diane",
+                    "Diane"
+                ])
+            ).all()
+        )
+        self.assertTrue(
+            (
+                result["correct_lastname"] ==
+                Series([
+                    "Abbott",
+                    "Abbott",
+                    "Abbott",
+                    "Abbott",
+                    "Hoffman",
+                    "Abernethy-Gillis",
+                    "Ablonczy",
+                    "Ablonczy",
+                    "Ablonczy",
+                    "Ablonczy"
+                ])
             ).all()
         )
 
