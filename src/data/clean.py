@@ -15,13 +15,28 @@ def find_correct_names(names):
     - Take the most frequent spelling from each cluster and consider it correct
     """
 
+    # build dataframe
     df = pandas.DataFrame(names, columns=["lastname", "firstname", "count"])
 
     # distance will be measured off of full name
     df["name"] = df["lastname"] + df["firstname"]
 
+    # cluster and label
+    df = _cluster_and_label(df)
+
+    # find the index of the max count within each label
+    correct = df.groupby("label")["count"].idxmax()
+
+    # join with the original dataframe
+
+    return df
+
+
+def _cluster_and_label(df, column="name", label="label"):
+    """Cluster a dataframe on the given column and add a "label" column"""
+
     # remove non-ascii characters, sklearn crashes
-    df["name"] = df["name"].apply(
+    df[column] = df[column].apply(
         lambda x: "".join([i for i in x if 0 < ord(i) < 127])
     )
 
@@ -31,12 +46,9 @@ def find_correct_names(names):
     # find labels
     dbscan = cluster.DBSCAN(eps=3, metric="precomputed", min_samples=1)
     labels = dbscan.fit_predict(dist)
-    df["label"] = labels
 
-    # find the index of the max count within each label
-    correct = df.groupby("label")["count"].idxmax()
-
-    # join with the original dataframe
+    # add labels
+    df[label] = labels
 
     return df
 
