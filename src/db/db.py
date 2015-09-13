@@ -15,28 +15,6 @@ SQLITE_DB_PATH = join(DATA_ROOT, "sqlite.db")
 Base = declarative_base()
 
 
-class DPOHCommDetailsView(Base):
-    """A view containing details of each communication that a DPOH participated
-    in.
-
-    This is a view and not a table, it must be created by an SQL script and
-    not by SQLAlchemy. Note that this class must be kept in sync with the
-    script that creates the view.
-    """
-    __tablename__ = "dpoh_com_details"
-    comlog_id = Column(Integer, primary_key=True, nullable=False)
-    com_date = Column(Date, nullable=False)
-    registrant_last_name = Column(String, nullable=False)
-    registrant_first_name = Column(String, nullable=False)
-    dpoh_last_name = Column(String, nullable=False)
-    dpoh_first_name = Column(String, nullable=False)
-    client_name = Column(String, nullable=False)
-    subject_matter = Column(String, nullable=False)
-
-    def com_date_str(self):
-        return datetime.strftime(self.com_date, TIME_FORMAT)
-
-
 class SubjectMatter(Base):
     """Subject of communications.
 
@@ -105,39 +83,33 @@ ENGINE = create_engine("sqlite:///{0}".format(SQLITE_DB_PATH))
 Base.metadata.create_all(ENGINE)
 
 
+# view is declared here so it is not created by create_all()
+class DPOHCommDetailsView(Base):
+    """A view containing details of each communication that a DPOH participated
+    in.
+
+    This is a view and not a table, it must be created by an SQL script and
+    not by SQLAlchemy. Note that this class must be kept in sync with the
+    script that creates the view.
+    """
+    __tablename__ = "dpoh_com_details"
+    comlog_id = Column(Integer, primary_key=True, nullable=False)
+    com_date = Column(Date, nullable=False)
+    registrant_last_name = Column(String, nullable=False)
+    registrant_first_name = Column(String, nullable=False)
+    dpoh_last_name = Column(String, nullable=False)
+    dpoh_first_name = Column(String, nullable=False)
+    client_name = Column(String, nullable=False)
+    subject_matter = Column(String, nullable=False)
+
+    def com_date_str(self):
+        return datetime.strftime(self.com_date, TIME_FORMAT)
+
+
 def make_sqlalchemy_session():
     return sessionmaker(bind=ENGINE)()
 
 
 def get_raw_connection():
     return sqlite3.connect(SQLITE_DB_PATH)
-
-
-def _get_dpoh_name_freq():
-    session = make_sqlalchemy_session()
-    query = session.query(
-        CommunicationDPOH.dpoh_last_name,
-        CommunicationDPOH.dpoh_first_name,
-        func.count(CommunicationDPOH.comlog_id))
-    query = query.group_by(
-        CommunicationDPOH.dpoh_last_name,
-        CommunicationDPOH.dpoh_first_name
-    )
-    query = query.order_by(
-        CommunicationDPOH.dpoh_last_name,
-        CommunicationDPOH.dpoh_first_name
-    )
-    return query.all()
-
-
-def fix_mispelled_registrant_names():
-    pass
-
-
-def update_correct_names(df):
-    pass
-
-
-def fix_mispelled_dpoh_names():
-    pass
 
