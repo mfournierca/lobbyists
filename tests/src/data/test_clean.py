@@ -1,5 +1,5 @@
 from unittest import TestCase
-from pandas import DataFrame
+from pandas import DataFrame, Series
 from numpy import ndarray, matrix
 
 from src.data.clean import (
@@ -7,6 +7,52 @@ from src.data.clean import (
     _cluster_and_label,
     _build_distance_matrix
 )
+
+
+class TestFindCorrectNames(TestCase):
+
+    def runTest(self):
+        pass
+
+    def setUp(self):
+        self.names = [
+            ["zzz", "aaa", 2],
+            ["zzz", "aab", 1],
+            ["xxx", "ddd", 2],
+            ["xxx", "dde", 1],
+            ["yyy", "fff", 1]
+        ]
+
+        self.expected = DataFrame(
+            self.names,
+            columns=["lastname", "firstname", "count"]
+        )
+        self.expected["correct_firstname"] = Series(
+            ["aaa", "aaa", "ddd", "ddd", "fff"]
+        )
+        self.expected["correct_lastname"] = Series(
+            ["zzz", "zzz", "xxx", "xxx", "yyy"]
+        )
+
+    def test_correct_names(self):
+
+        result = find_correct_names(self.names)
+
+        print(self.expected)
+        print(result)
+
+        self.assertTrue(
+            (
+                result["correct_firstname"] ==
+                self.expected["correct_firstname"]
+            ).all()
+        )
+        self.assertTrue(
+            (
+                result["correct_lastname"] ==
+                self.expected["correct_lastname"]
+            ).all()
+        )
 
 
 class TestClusterAndLabel(TestCase):
@@ -17,13 +63,13 @@ class TestClusterAndLabel(TestCase):
     def setUp(self):
         self.df = DataFrame(
             [
-                ["aaa", "zzz", 2],
-                ["aab", "zzz", 1],
-                ["ddd", "xxx", 2],
-                ["dde", "xxx", 2],
-                ["fff", "yyy", 1]
+                ["zzz", "aaa", 2],
+                ["zzz", "aab", 1],
+                ["xxx", "ddd", 2],
+                ["xxx", "dde", 2],
+                ["yyy", "fff", 1]
             ],
-            columns=["firstname", "lastname", "count"]
+            columns=["lastname", "firstname", "count"]
         )
         self.df["name"] = self.df["lastname"] + self.df["firstname"]
 
@@ -42,12 +88,12 @@ class TestBuildDistanceMatrix(TestCase):
     def setUp(self):
         self.df = DataFrame(
             [
-                ["aaa", "zzz", 1],
-                ["aab", "zzz", 1],
-                ["abb", "zzz", 1],
-                ["bbb", "zzz", 1]
+                ["zzz", "aaa", 1],
+                ["zzz", "aab", 1],
+                ["zzz", "abb", 1],
+                ["zzz", "bbb", 1]
             ],
-            columns=["firstname", "lastname", "count"]
+            columns=["lastname", "lastname", "count"]
         )
         self.df["name"] = self.df["lastname"] + self.df["firstname"]
 

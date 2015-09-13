@@ -13,6 +13,8 @@ def find_correct_names(names):
 
     - Cluster the names so that different spellings are in the same cluster
     - Take the most frequent spelling from each cluster and consider it correct
+
+    Return a dataframe containing the original and correct name on each row.
     """
 
     df = pandas.DataFrame(names, columns=["lastname", "firstname", "count"])
@@ -22,8 +24,20 @@ def find_correct_names(names):
 
     # find the index of the max count within each label
     correct = df.groupby("label")["count"].idxmax()
+    correct = pandas.DataFrame(correct)
+    correct.columns = ["maxcount_index"]
+    correct["label"] = correct.index
 
-    # join with the original dataframe
+    # add the correct name on each row
+    df = pandas.merge(df, correct, how="inner", on="label")
+    df["correct_firstname"] = df.apply(
+        lambda row: df.ix[row["maxcount_index"]]["firstname"],
+        axis=1
+    )
+    df["correct_lastname"] = df.apply(
+        lambda row: df.ix[row["maxcount_index"]]["lastname"],
+        axis=1
+    )
 
     return df
 
