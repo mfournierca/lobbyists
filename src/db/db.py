@@ -1,11 +1,7 @@
 import sqlite3
-import pandas
-import numpy
-import Levenshtein
 
 from os.path import join
 from datetime import datetime
-from sklearn import cluster
 
 from sqlalchemy import Column, ForeignKey, Integer, String, Date, func
 from sqlalchemy.ext.declarative import declarative_base
@@ -117,10 +113,6 @@ def get_raw_connection():
     return sqlite3.connect(SQLITE_DB_PATH)
 
 
-def fix_mispelled_dpoh_names():
-    names = _get_dpoh_name_freq()
-
-
 def _get_dpoh_name_freq():
     session = make_sqlalchemy_session()
     query = session.query(
@@ -146,60 +138,6 @@ def update_correct_names(df):
     pass
 
 
-def find_correct_names(names):
-    """Given a list of (lastname, firstname, frequency) tuples find the correct
-    spelling of each name.
+def fix_mispelled_dpoh_names():
+    pass
 
-    We accomplish this in 2 steps:
-
-    - Cluster the names so that mispellings are in the same cluster
-    - Take the most frequent spelling from each cluster and consider it correct
-    """
-
-    df = pandas.DataFrame(names, columns=["lastname", "firstname", "count"])
-
-    # distance will be measured off of full name
-    df["name"] = df["lastname"] + df["firstname"]
-
-    # remove non-ascii characters, sklearn crashes
-    df["name"] = df["name"].apply(
-        lambda x: "".join([i for i in x if 0 < ord(i) < 127])
-    )
-
-    # build distance matrix
-    dist = _build_distance_matrix(df)
-
-    # find labels
-    dbscan = cluster.DBSCAN(eps=3, metric="precomputed", min_samples=1)
-    labels = dbscan.fit_predict(dist)
-    df["label"] = labels
-
-    # find the index of the max count within each label
-    correct = df.groupby("label")["count"].idxmax()
-
-    # join with the original dataframe
-
-    return df
-
-
-def _build_distance_matrix(df, col="name"):
-    dist = numpy.ndarray((len(df), len(df)))
-    dist.fill(10000)
-    width = 10
-    for i, n in enumerate(df[col]):
-        if i - width < 0:
-            lower = 0
-        else:
-            lower = i - width
-
-        if i + width > len(df[col]):
-            upper = len(df[col])
-        else:
-            upper = i + width
-
-        for j, m in enumerate(df[col][lower:upper]):
-            pos = j + lower
-            d = Levenshtein.distance(n, m)
-            dist[i][pos] = d
-
-    return dist
