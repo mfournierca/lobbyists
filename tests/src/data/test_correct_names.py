@@ -43,16 +43,16 @@ class TestFindCorrectNames(TestCase):
 
     def test_real_names(self):
         names = [
-            ["Abbot", "Jim", "2"],
-            ["Abbott", "James", "1"],
-            ["Abbott", "Jim", "25"],
-            ["Abbott", "Connie", "1"],
-            ["Hoffman", "Abby", "1"],
-            ["Abernethy-Gillis", "Robyn", "1"],
-            ["Ablonczy", "Diane", "110"],
-            ["Ablonczy", "Dianne", "1"],
-            ["Ablonsky", "Diane", "1"],
-            ["Ablonczy", "Honourable Diane", "2"]
+            (u"Abbot", u"Jim", 2),
+            (u"Abbott", u"James", 1),
+            (u"Abbott", u"Jim", 25),
+            (u"Abbott", u"Connie", 1),
+            (u"Hoffman", u"Abby", 1),
+            (u"Abernethy-Gillis", u"Robyn", 1),
+            (u"Ablonczy", u"Diane", 110),
+            (u"Ablonczy", u"Dianne", 1),
+            (u"Ablonsky", u"Diane", 1),
+            (u"Ablonczy", u"Honourable Diane", 2)
         ]
 
         result = find_correct_names(names)
