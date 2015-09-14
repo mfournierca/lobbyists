@@ -20,7 +20,7 @@ def find_correct_names(names):
     df = pandas.DataFrame(names, columns=["lastname", "firstname", "count"])
     df["name"] = df["lastname"] + df["firstname"]
 
-    df = _cluster_and_label(df, column="name")
+    df = _cluster_and_label(df, column="name", label="label")
 
     # find the index of the max count within each label
     correct = df.groupby("label")["count"].idxmax()
@@ -29,7 +29,8 @@ def find_correct_names(names):
     correct["label"] = correct.index
 
     # add the correct name on each row
-    df = pandas.merge(df, correct, how="inner", on="label")
+    # merge inner left to preserve index
+    df = pandas.merge(df, correct, how="left", on="label")
     df["correct_firstname"] = df.apply(
         lambda row: df.ix[row["maxcount_index"]]["firstname"],
         axis=1
@@ -71,6 +72,10 @@ def _build_distance_matrix(
     ):
     dist = numpy.ndarray((len(df), len(df)))
     dist.fill(default_dist_value)
+
+    # sort so the comparison width works as expected
+    df = df.sort([col])
+
     for i, n in enumerate(df[col]):
         if i - width <= 0:
             lower = 0
