@@ -19,11 +19,11 @@ class TestFindCorrectNames(TestCase):
 
     def test_simple_names(self):
         names = [
-            ["zzz", "aaa", 2],
-            ["zzz", "aab", 1],
-            ["xxx", "ddd", 2],
-            ["xxx", "dde", 1],
-            ["yyy", "fff", 1]
+            ["xxx", "aaa", 2],
+            ["xxx", "aab", 1],
+            ["yyy", "ddd", 2],
+            ["yyy", "dde", 1],
+            ["zzz", "fff", 1]
         ]
 
         result = find_correct_names(names)
@@ -32,13 +32,15 @@ class TestFindCorrectNames(TestCase):
             (
                 result["correct_firstname"] ==
                 Series(["aaa", "aaa", "ddd", "ddd", "fff"])
-            ).all()
+            ).all(),
+            "\n{0}".format(result)
         )
         self.assertTrue(
             (
                 result["correct_lastname"] ==
-                Series(["zzz", "zzz", "xxx", "xxx", "yyy"])
-            ).all()
+                Series(["xxx", "xxx", "yyy", "yyy", "zzz"])
+            ).all(),
+            "\n{0}".format(result)
         )
 
     def test_real_names(self):
@@ -84,7 +86,8 @@ class TestFindCorrectNames(TestCase):
         ])
 
         print(expected[["correct_lastname", "correct_firstname"]])
-        print(result[["correct_lastname", "correct_firstname"]])
+        print("")
+        print(result)
 
         self.assertTrue(
             (
@@ -106,11 +109,11 @@ class TestClusterAndLabel(TestCase):
     def setUp(self):
         self.df = DataFrame(
             [
-                ["zzz", "aaa", 2],
-                ["zzz", "aab", 1],
-                ["xxx", "ddd", 2],
-                ["xxx", "dde", 2],
-                ["yyy", "fff", 1]
+                ["xxx", "aaa", 2],
+                ["xxx", "aab", 1],
+                ["yyy", "ccc", 1],
+                ["zzz", "ddd", 2],
+                ["zzz", "dde", 1]
             ],
             columns=["lastname", "firstname", "count"]
         )
@@ -120,8 +123,9 @@ class TestClusterAndLabel(TestCase):
         del self.df
 
     def test_cluster_labels(self):
-        expected = [0, 0, 1, 1, 2]
+        expected = [0, 0, 1, 2, 2]
         result = _cluster_and_label(self.df, column="name", label="label")
+        result = result.sort(["name"])
         result = list(result["label"])
         self.assertEqual(result, expected)
 
