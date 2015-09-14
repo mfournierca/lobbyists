@@ -57,8 +57,6 @@ class TestFindCorrectNames(TestCase):
             (u"Ablonczy", u"Honourable Diane", 2)
         ]
 
-        result = find_correct_names(names)
-
         expected = DataFrame()
         expected["correct_lastname"] = Series([
             "Abbott",
@@ -85,9 +83,10 @@ class TestFindCorrectNames(TestCase):
             "Honourable Diane"
         ])
 
-        print(expected[["correct_lastname", "correct_firstname"]])
-        print("")
-        print(result)
+        result = find_correct_names(names)
+
+        result = result.sort(["correct_lastname", "correct_firstname"])
+        expected = expected.sort(["correct_lastname", "correct_firstname"])
 
         self.assertTrue(
             (

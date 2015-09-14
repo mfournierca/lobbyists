@@ -31,17 +31,18 @@ def find_correct_names(names):
     correct.columns = ["maxcount_index"]
     correct["label"] = correct.index
 
-    # add the correct name on each row
-    # merge inner left to preserve index
-    df = pandas.merge(df, correct, how="left", on="label")
-    df["correct_firstname"] = df.apply(
+    # add correct names
+    correct["correct_firstname"] = correct.apply(
         lambda row: df.ix[row["maxcount_index"]]["firstname"],
         axis=1
     )
-    df["correct_lastname"] = df.apply(
+    correct["correct_lastname"] = correct.apply(
         lambda row: df.ix[row["maxcount_index"]]["lastname"],
         axis=1
     )
+
+    # merge inner left to preserve index
+    df = pandas.merge(df, correct, how="left", on="label")
 
     return df
 
