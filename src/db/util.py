@@ -1,7 +1,7 @@
 from src.db.db import *
 
 
-def _get_dpoh_name_freq():
+def get_dpoh_name_freq():
     session = make_sqlalchemy_session()
     query = session.query(
         CommunicationDPOH.dpoh_last_name,
