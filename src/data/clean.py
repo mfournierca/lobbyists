@@ -5,6 +5,7 @@ import pandas as pd
 import Levenshtein
 
 from sqlalchemy import update
+from sqlalchemy import exc as sqlalchemy_exceptions
 
 from src.db import db, util
 from src.data import correct_names
@@ -75,10 +76,16 @@ def fix_mispelled_dpoh_names():
             dpoh_first_name=correct_firstname,
             dpoh_last_name=correct_lastname
         )
-        trans.connection.execute(stmt)
+
+        try:
+            # misspellings can cause collisions
+            trans.connection.execute(stmt)
+        except sqlalchemy_exceptions.IntegrityError as e:
+            logbook.error(e)
+            continue
 
         counter += 1
-        if counter % 100 == 0:
+        if counter % 250 == 0:
             trans.commit()
             trans.close()
             trans = conn.begin()
