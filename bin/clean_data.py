@@ -10,12 +10,12 @@ import logbook
 
 from docopt import docopt
 
-from src import db, data
+from src import data
 
 
 def run():
     logbook.info("correcting names")
-    db.util.fix_mispelled_dpoh_names()
+    data.clean.fix_mispelled_dpoh_names()
 
 
 if __name__ == "__main__":
