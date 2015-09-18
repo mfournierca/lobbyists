@@ -5,28 +5,6 @@ from sklearn import cluster
 import Levenshtein
 
 
-def _filter_known_correct_names(names):
-    """Manually filter out known correct names from the provided list of names.
-
-    The names list must contain tuples of the form
-
-    ("lastname", "firstname", count)
-
-    The filtered list is returned.
-
-    The clustering strategy for finding the correct spelling of names has
-    some flaws. The algorithm has a high precision, but not perfect - it will
-    "correct" valid names in some cases. For example, using a max Levenshtein
-    distance of 3 for the clustering will cause "Gord Brown" and "Lois Brown"
-    to be considered the same, and "corrected".
-    """
-
-
-    names = filter(lambda x: x[0] == "Brown" and x[1] == "Gord", names)
-    names = filter(lambda x: x[0] == "Brown" and x[1] == "Lois", names)
-    return names
-
-
 def find_correct_names(names):
     """Given a list of (lastname, firstname, count) tuples find the correct
     spelling of each name.
@@ -38,9 +16,6 @@ def find_correct_names(names):
 
     Return a dataframe containing the original and correct name on each row.
     """
-
-    names = _filter_known_correct_names(names)
-
     df = pandas.DataFrame(names, columns=["lastname", "firstname", "count"])
     df["name"] = df["lastname"] + df["firstname"]
 
@@ -98,6 +73,9 @@ def _build_distance_matrix(
         width=10,
         default_dist_value=10000
     ):
+
+    mismatches = _mismatched_names()
+
     dist = numpy.ndarray((len(df), len(df)))
     dist.fill(default_dist_value)
 
@@ -114,7 +92,30 @@ def _build_distance_matrix(
 
         for j, m in enumerate(df[col][lower:upper + 1]):
             pos = j + lower
-            d = Levenshtein.distance(n, m)
+
+            if mismatches.get(n) == m or mismatches.get(m) == n:
+                d = default_dist_value
+            else:
+                d = Levenshtein.distance(n, m)
+
             dist[i][pos] = d
 
     return dist
+
+
+def _mismatched_names():
+    """Provide a dictionary of names that are known to not match.
+
+    The clustering strategy for finding the correct spelling of names has
+    some flaws. The algorithm has a high precision, but not perfect - it will
+    "correct" valid names in some cases. For example, using a max Levenshtein
+    distance of 3 for the clustering will cause "Gord Brown" and "Lois Brown"
+    to be considered the same, and "corrected".
+    """
+    mismatches = {
+        "BrownGord": "BrownLois",
+        "ClarkeJohn": "ClarkeRob"
+    }
+
+    mismatches.update({v: k for k, v in mismatches.iteritems()})
+    return mismatches
