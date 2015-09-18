@@ -126,6 +126,10 @@ def make_sqlalchemy_session():
     return sessionmaker(bind=ENGINE)()
 
 
-def get_raw_connection():
+def get_sqlalchemy_connection():
+    return ENGINE.connect()
+
+
+def get_sqlite_connection():
     return sqlite3.connect(SQLITE_DB_PATH)
 
