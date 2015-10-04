@@ -49,12 +49,12 @@ def publicservant_itinerary(lastname=None, firstname=None):
     }
     for r in results:
         response["data"]["itinerary"].append({
-            r.com_date_str():
-                "reg_first_name": r.registrant_first_name,
-                "reg_last_name": r.registrant_last_name,
-                "comlog_id": r.comlog_id,
-                "subject_matter": r.subject_matter,
-                "client_name": r.client_name
+            "date": r.com_date_str(),
+            "reg_first_name": r.registrant_first_name,
+            "reg_last_name": r.registrant_last_name,
+            "comlog_id": r.comlog_id,
+            "subject_matter": r.subject_matter,
+            "client_name": r.client_name
         })
     return response
 
