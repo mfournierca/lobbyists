@@ -106,13 +106,14 @@ class DPOHCommDetailsView(Base):
     """
     __tablename__ = "dpoh_com_details"
     comlog_id = Column(Integer, primary_key=True, nullable=False)
+    subject_matter = Column(String, primary_key=True, nullable=False)
+    client_num = Column(String, primary_key=True, nullable=False)
+    client_name = Column(String, nullable=False)
     com_date = Column(Date, nullable=False)
     registrant_last_name = Column(String, nullable=False)
     registrant_first_name = Column(String, nullable=False)
     dpoh_last_name = Column(String, nullable=False)
     dpoh_first_name = Column(String, nullable=False)
-    client_name = Column(String, nullable=False)
-    subject_matter = Column(String, nullable=False)
 
     def com_date_str(self):
         return datetime.strftime(self.com_date, TIME_FORMAT)
@@ -133,3 +134,6 @@ def get_sqlalchemy_connection():
 def get_sqlite_connection():
     return sqlite3.connect(SQLITE_DB_PATH)
 
+
+def get_raw_connection():
+    return get_sqlite_connection()

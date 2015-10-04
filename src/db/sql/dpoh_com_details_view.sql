@@ -8,6 +8,7 @@ SELECT
     dpoh.dpoh_last_name AS dpoh_last_name,
     dpoh.dpoh_first_name AS dpoh_first_name,
     client.client_name AS client_name,
+    client.client_num AS client_num,
     sm.subject_matter AS subject_matter
 FROM communication_dpoh AS dpoh
     INNER JOIN subject_matter AS sm ON sm.comlog_id == dpoh.comlog_id
