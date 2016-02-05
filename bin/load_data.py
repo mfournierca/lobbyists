@@ -37,11 +37,11 @@ def run_sql_scripts():
         join(SQL_SCRIPTS_DIR, "dpoh_com_details_view.sql"),
         join(SQL_SCRIPTS_DIR, "create_indices.sql")
     ]
-    conn = db.get_raw_connection()
+    conn = db.get_sqlalchemy_connection()
     for script in scripts:
         logbook.debug("running {0}".format(script))
         sql = open(script, "r")
-        conn.executescript("".join(sql.readlines()))
+        conn.engine.execute("".join(sql.readlines()))
 
 
 def _load(session, csvfile, row_creator, commit_interval=10000):
