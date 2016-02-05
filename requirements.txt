@@ -1,7 +1,11 @@
+scipy
+numpy
+pandas
+sklearn
 flask
 flask-cors
 sqlalchemy
-sqlite3
 docopt
 python-Levenshtein
+logbook
 
