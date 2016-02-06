@@ -18,7 +18,6 @@ APP = Flask(__name__)
 BASE_PATH = "/app/v1/{0}"
 PORT = 8081
 
-
 @APP.route(BASE_PATH.format("itinerary"))
 def itinerary():
     """The itinerary app page."""

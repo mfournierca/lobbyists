@@ -45,12 +45,19 @@ body {
 </head>
 <body>
 
-<div id="controls"></div>
+<div id="controls">
+  <div id="form-controls">
+    <select id="form-controls-select"></select>
+    <button onclick="refreshCalendarFromSelection();">Go!</button>
+  </div>
+</div>
 <div id="calendar"></div>
 <div>
   <div id="details"></div>
 </div>
 
+<script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+<script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
 <script>
 
@@ -99,38 +106,65 @@ svg.selectAll(".month")
     .attr("d", monthPath);
 
 d3.json(
-  "http://localhost:5001/api/v1/publicservant/{{dpoh_lastname}}_{{ dpoh_firstname }}/itinerary",
+  "http://localhost:5001/api/v1/publicservant/names",
   function(error, json) {
     if (error) throw error;
 
-    var data = json["itinerary"];
-
-    rect.filter(function(d) { return d in data; })
-        .attr("class", function(d) { return "day " + color(data[d].length); })
-      .select("title")
-        .text(function(d) { return d + ": " + data[d].length; });
-
-    rect.on("click", function(d) {
-        d3.select("#details")
-          .selectAll("*").remove();
-
-        var selection = d3.select("#details").selectAll("div")
-          .data(data[d])
-          .enter()
-          .append("div").attr("class", "details-item")
-
-        var ul = selection.append("ul")
-
-        ul.append("li")
-          .text(function(e) {
-            return e["reg_first_name"] + " " + e["reg_last_name"] + ", " + e["client_name"]
-          });
-
-        selection.append("p")
-          .text(function(e) {
-          });
-    });
+    var formcontrols = d3.select("#form-controls-select").selectAll("option")
+      .data(json)
+      .enter()
+      .append("option")
+      .attr("value", function(d) { return d; })
+      .text(function(d) { return d; })
 });
+
+
+function refreshCalendarFromSelection() {
+  var name = $("#form-controls-select").val().split(",");
+  console.log(name);
+  refreshCalendar(name[0], name[1]);
+}
+
+
+function refreshCalendar(lastname, firstname) {
+
+  rect.attr("class", "day");
+
+  d3.json(
+    "http://localhost:5001/api/v1/publicservant/" + lastname + "_" + firstname + "/itinerary", 
+    function(error, json) {
+      if (error) throw error;
+
+      var data = json["itinerary"];
+
+      rect.filter(function(d) { return d in data; })
+          .attr("class", function(d) { return "day " + color(data[d].length); })
+        .select("title")
+          .text(function(d) { return d + ": " + data[d].length; });
+
+      rect.on("click", function(d) {
+          d3.select("#details")
+            .selectAll("*").remove();
+
+          var selection = d3.select("#details").selectAll("div")
+            .data(data[d])
+            .enter()
+            .append("div").attr("class", "details-item")
+
+          var ul = selection.append("ul")
+
+          ul.append("li")
+            .text(function(e) {
+              return e["reg_first_name"] + " " + e["reg_last_name"] + ", " + e["client_name"]
+            });
+
+          selection.append("p")
+            .text(function(e) {
+            });
+      });
+  });
+}
+
 
 function monthPath(t0) {
   var t1 = new Date(t0.getFullYear(), t0.getMonth() + 1, 0),
