@@ -6,6 +6,7 @@ Usage:
 Options:
 
     --help                        Show this help screen
+    --scripts-only                Do not load data, only run the SQL scripts
     --commit-interval=<interval>  Number of rows to commit at a time
                                   [default: 10000]
 """
@@ -22,12 +23,13 @@ from src.db import db
 from src.data import clean
 
 
-def load_all(commit_interval=10000):
+def load_all(commit_interval=10000, scripts_only=False):
     session = db.make_sqlalchemy_session()
-    load_subject_matter(session, commit_interval=commit_interval)
-    load_communication_registrant(session, commit_interval=commit_interval)
-    load_communication_dpoh(session, commit_interval=commit_interval)
-    load_client(session, commit_interval=commit_interval)
+    if not scripts_only:
+        load_subject_matter(session, commit_interval=commit_interval)
+        load_communication_registrant(session, commit_interval=commit_interval)
+        load_communication_dpoh(session, commit_interval=commit_interval)
+        load_client(session, commit_interval=commit_interval)
     run_sql_scripts()
 
 
@@ -37,11 +39,11 @@ def run_sql_scripts():
         join(SQL_SCRIPTS_DIR, "dpoh_com_details_view.sql"),
         join(SQL_SCRIPTS_DIR, "create_indices.sql")
     ]
-    conn = db.get_sqlalchemy_connection()
+    conn = db.get_raw_connection()
     for script in scripts:
         logbook.debug("running {0}".format(script))
         sql = open(script, "r")
-        conn.engine.execute("".join(sql.readlines()))
+        conn.executescript("".join(sql.readlines()))
 
 
 def _load(session, csvfile, row_creator, commit_interval=10000):
@@ -142,4 +144,7 @@ def load_subject_matter(session, commit_interval=10000):
 
 if __name__ == "__main__":
     args = docopt(__doc__)
-    load_all(commit_interval=int(args["--commit-interval"]))
+    load_all(
+        commit_interval=int(args["--commit-interval"]),
+        scripts_only=args["--scripts-only"]
+    )

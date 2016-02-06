@@ -6,6 +6,7 @@ from datetime import datetime
 from sqlalchemy import Column, ForeignKey, Integer, String, Date, func
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.sql import text
 from sqlalchemy import create_engine
 
 from src.constants import DATA_ROOT, TIME_FORMAT
@@ -130,6 +131,6 @@ def get_sqlalchemy_connection():
     return ENGINE.connect()
 
 
-def get_sqlite_connection():
+def get_raw_connection():
     return sqlite3.connect(SQLITE_DB_PATH)
 
