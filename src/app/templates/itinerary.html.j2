@@ -31,12 +31,25 @@ body {
 .RdYlGn .q9-11{fill:rgb(26,152,80)}
 .RdYlGn .q10-11{fill:rgb(0,104,55)}
 
+#details {
+  width: 50%;
+  padding: 10px;
+}
+
+#details ul {
+  font-style: Arial;
+  font-size: 14pt;
+}
+
 </style>
 </head>
 <body>
+
 <div id="controls"></div>
 <div id="calendar"></div>
-<div id="details"></div>
+<div>
+  <div id="details"></div>
+</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.5/d3.min.js"></script>
 <script>
@@ -86,7 +99,7 @@ svg.selectAll(".month")
     .attr("d", monthPath);
 
 d3.json(
-  "http://localhost:5001/api/v1/publicservant/Harper_Stephen/itinerary",
+  "http://localhost:5001/api/v1/publicservant/{{dpoh_lastname}}_{{ dpoh_firstname }}/itinerary",
   function(error, json) {
     if (error) throw error;
 
@@ -106,13 +119,15 @@ d3.json(
           .enter()
           .append("div").attr("class", "details-item")
 
-        selection.append("p")
+        var ul = selection.append("ul")
+
+        ul.append("li")
           .text(function(e) {
-            return e["client_name"]
+            return e["reg_first_name"] + " " + e["reg_last_name"] + ", " + e["client_name"]
           });
+
         selection.append("p")
           .text(function(e) {
-            return e["reg_last_name"] + ", " + e["reg_first_name"]
           });
     });
 });

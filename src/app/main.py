@@ -9,7 +9,9 @@ Options:
 """
 import logbook
 from docopt import docopt
-from flask import Flask, render_template
+from flask import Flask, render_template, request
+
+from src.data.clean import clean_name
 
 APP = Flask(__name__)
 
@@ -19,13 +21,11 @@ PORT = 8081
 
 @APP.route(BASE_PATH.format("itinerary"))
 def itinerary():
-    """Home page of the web app.
+    """The itinerary app page."""
+    dpoh_firstname = clean_name(request.args.get("firstname", "Stephen"))
+    dpoh_lastname = clean_name(request.args.get("lastname", "Harper"))
 
-    The view and controller are managed by javascript and d3. The model is the
-    api.
-    """
-    return render_template("itinerary.html.j2")
-
+    return render_template("itinerary.html.j2", dpoh_firstname=dpoh_firstname, dpoh_lastname=dpoh_lastname)
 
 if __name__ == "__main__":
     args = docopt(__doc__)

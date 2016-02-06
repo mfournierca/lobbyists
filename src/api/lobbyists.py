@@ -12,12 +12,12 @@ import logbook
 from docopt import docopt
 from flask import Flask, Response
 from flask.ext.cors import CORS
-from src import db
+from src.db import db
 from json import dumps
 from sqlalchemy import asc
 from collections import defaultdict
 
-from src.common import clean_name
+from src.data.clean import clean_name
 
 APP = Flask(__name__)
 CORS(APP)
