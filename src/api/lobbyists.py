@@ -14,7 +14,7 @@ from flask import Flask, Response
 from flask.ext.cors import CORS
 from src.db import db
 from json import dumps
-from sqlalchemy import asc
+from sqlalchemy import asc, desc, func, text
 from collections import defaultdict
 
 from src.data.clean import clean_name
@@ -25,6 +25,28 @@ CORS(APP)
 SESSION = db.make_sqlalchemy_session()
 BASE_PATH = "/api/v1/{0}"
 PORT = 5001
+
+
+def client_frequency(lastname=None, firstname=None, limit=100):
+    """Rank the clients (i.e. lobbyists) by the number of times they met with
+    the specified public servant"""
+    lastname = clean_name(lastname) if lastname else ""
+    firstname = clean_name(firstname) if firstname else ""
+
+    expression = text("""
+    SELECT comlog_id, client_name, com_date, COUNT(client_name) as count_client_name
+    FROM (
+        SELECT DISTINCT comlog_id, client_name, com_date
+        FROM dpoh_com_details
+        WHERE dpoh_last_name == :lastname
+            AND dpoh_first_name == :firstname
+    )
+    GROUP BY client_name
+    ORDER BY count_client_name DESC
+    LIMIT :limit
+    """).bindparams(lastname=lastname, firstname=firstname, limit=limit)
+    query = SESSION.execute(expression)
+    return query.fetchall()
 
 
 def publicservant_itinerary(lastname=None, firstname=None, limit=100):
