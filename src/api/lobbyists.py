@@ -49,6 +49,11 @@ def client_frequency(lastname=None, firstname=None, limit=100):
     return query.fetchall()
 
 
+@APP.route(BASE_PATH.format("publicservant/<lastname>_<firstname>/frequency"))
+def _client_frequency(lastname=None, firstname=None, limit=100):
+    pass
+
+
 def publicservant_itinerary(lastname=None, firstname=None, limit=100):
     """Get the itinerary of lobbyist meetings for a given public servant."""
     lastname = clean_name(lastname) if lastname else ""
