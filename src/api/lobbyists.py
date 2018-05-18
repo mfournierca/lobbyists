@@ -51,7 +51,10 @@ def client_frequency(lastname=None, firstname=None, limit=100):
 
 @APP.route(BASE_PATH.format("publicservant/<lastname>_<firstname>/frequency"))
 def _client_frequency(lastname=None, firstname=None, limit=100):
-    pass
+    data = client_frequency(lastname=lastname, firstname=firstname, limit=limit)
+    print(data)
+    data = dumps(data)
+    return Response(data, status=200, mimetype="application/json")
 
 
 def publicservant_itinerary(lastname=None, firstname=None, limit=100):
